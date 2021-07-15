@@ -1,0 +1,21 @@
+{
+  "name": "petrovda/sdk",
+  "description": "test sdk",
+  "keywords": ["petrov", "sdk"],
+  "type": "library",
+  "homepage": "https://github.com/DimetrioDecimus/fotostrana.phpsdk",
+  "license": "MIT",
+  "require": {
+    "php": ">=7.0"
+  },
+  "require-dev": {},
+  "repositories": [
+    {
+      "type": "git",
+      "url": "https://github.com/DimetrioDecimus/fotostrana.phpsdk"
+    }
+  ],
+  "autoload": {
+    "psr-4": { "fotostrana\\": "resources" }
+  }
+}
