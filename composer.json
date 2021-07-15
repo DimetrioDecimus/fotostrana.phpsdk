@@ -1,20 +1,21 @@
 {
-  "name": "petrovda/sdk",
-  "description": "test sdk",
-  "keywords": ["petrov", "sdk"],
-  "type": "library",
-  "homepage": "https://github.com/DimetrioDecimus/fotostrana.phpsdk",
+  "name": "petrovda/fotostrana.phpsdk",
+  "description": "description",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "DimetrioDecimus",
+      "email": "email@example.com"
+    }
+  ],
   "require": {
-    "php": ">=7.0"
+    
   },
-  "require-dev": {},
   "repositories": [
     {
       "type": "git",
       "url": "https://github.com/DimetrioDecimus/fotostrana.phpsdk"
     }
-  ],
-  "autoload": {
-    "psr-4": { "Fotostrana\\": "resources/" }
-  }
+  ]
 }
