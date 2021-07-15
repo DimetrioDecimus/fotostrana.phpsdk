@@ -1,7 +1,6 @@
 {
   "name": "dimetriodecimus/fs-sdk",
   "description": "description",
-  "minimum-stability": "stable",
   "license": "proprietary",
   "authors": [
     {
@@ -10,8 +9,12 @@
     }
   ],
   "require": {
-    
+    "php": ">=7.0.0"
   },
+  "require-dev": {
+
+  },
+  "minimum-stability": "dev",
   "repositories": [
     {
       "type": "git",
