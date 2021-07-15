@@ -4,7 +4,6 @@
   "keywords": ["petrov", "sdk"],
   "type": "library",
   "homepage": "https://github.com/DimetrioDecimus/fotostrana.phpsdk",
-  "license": "MIT",
   "require": {
     "php": ">=7.0"
   },
@@ -16,6 +15,6 @@
     }
   ],
   "autoload": {
-    "psr-4": { "fotostrana\\": "resources" }
+    "psr-4": { "Fotostrana\\": "resources/" }
   }
 }
