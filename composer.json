@@ -1,10 +1,11 @@
 {
-  "name": "petrovda/phpsdk",
+  "name": "dimetriodecimus/fs-sdk",
   "description": "description",
+  "minimum-stability": "stable",
   "license": "proprietary",
   "authors": [
     {
-      "name": "DimetrioDecimus",
+      "name": "pda12",
       "email": "email@example.com"
     }
   ],
@@ -16,5 +17,8 @@
       "type": "git",
       "url": "https://github.com/DimetrioDecimus/fotostrana.phpsdk"
     }
-  ]
+  ],
+  "autoload": {
+    "psr-4": { "PetrovDAUtils\\": "src/PetrovDAUtils" }
+  }
 }
