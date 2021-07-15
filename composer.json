@@ -1,7 +1,6 @@
 {
   "name": "petrovda/phpsdk",
   "description": "description",
-  "minimum-stability": "stable",
   "license": "proprietary",
   "authors": [
     {
