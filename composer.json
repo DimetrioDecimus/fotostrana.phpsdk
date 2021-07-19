@@ -8,12 +8,6 @@
       "email": "email@example.com"
     }
   ],
-  "require": {
-    "php": ">=7.0.0"
-  },
-  "require-dev": {
-
-  },
   "minimum-stability": "stable",
   "repositories": [
     {
