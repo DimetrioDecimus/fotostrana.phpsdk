@@ -4,4 +4,5 @@ require __DIR__ . '/../vendor/autoload.php';
 
 use PetrovDAUtils;
 
-PetrovDAUtils\Utils::show('HELLO WORLD!');
+$forostranaSdk = new PetrovDAUtils\FotostranaSdk();
+$forostranaSdk->getUser(111);
