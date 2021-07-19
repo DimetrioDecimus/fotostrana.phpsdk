@@ -2,6 +2,7 @@
 namespace PetrovDAUtils\Models;
 
 use PetrovDAUtils\FotostranaError;
+use PetrovDAUtils\Enums\FotostranaEnumsProtocol;
 
 /**
  * Êëàññ îáúåêòà-ñòåíû
@@ -27,8 +28,8 @@ class FotostranaWall extends FotostranaObject
             $this->lastError = null;
             $r = $this->request();
             $r->setMethod('WallUser.appPost');
-            $r->setParam('text',$text);
-            $r->setParam('linkParams',$linkParams);
+            $r->setParam(FotostranaEnumsProtocol::TEXT,$text);
+            $r->setParam(FotostranaEnumsProtocol::LINK_PARAMS,$linkParams);
             $apiresult = $r->get();
             return $apiresult;
         }
@@ -57,17 +58,17 @@ class FotostranaWall extends FotostranaObject
                 // ïğîñòîé çàïğîñ
                 $r = $this->request();
                 $r->setMethod('WallUser.appPostImage');
-                $r->setParam('text',$text);
-                $r->setParam('linkParams',$linkParams);
-                $r->setParam('imgUrl',$img);
+                $r->setParam(FotostranaEnumsProtocol::TEXT,$text);
+                $r->setParam(FotostranaEnumsProtocol::LINK_PARAMS,$linkParams);
+                $r->setParam(FotostranaEnumsProtocol::IMG_URL,$img);
                 $apiresult = $r->get();
             } else {
                 // POST-çàïğîñ CURL-îì
                 $r = $this->request();
                 $r->setMethod('WallUser.appPostImage');
-                $r->setParam('text',$text);
-                $r->setParam('linkParams',$linkParams);
-                $r->setParam('foto-img',"@".$img);
+                $r->setParam(FotostranaEnumsProtocol::TEXT,$text);
+                $r->setParam(FotostranaEnumsProtocol::LINK_PARAMS,$linkParams);
+                $r->setParam(FotostranaEnumsProtocol::FOTO_IMG,"@".$img);
                 $r->setMode('POST');
                 $apiresult = $r->get();
             }

@@ -14,7 +14,7 @@
   "require-dev": {
 
   },
-  "minimum-stability": "dev",
+  "minimum-stability": "stable",
   "repositories": [
     {
       "type": "git",

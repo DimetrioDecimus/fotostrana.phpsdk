@@ -6,16 +6,25 @@ namespace PetrovDAUtils\Models;
 abstract class FotostranaBase
 {
 
+    /** @var FotostranaObject[]  */
     protected $ocache = array(); // кэш объектов php
 
-    function getFromOCache($key)
+    /**
+     * @param string $key
+     * @return mixed
+     */
+    function getFromOCache(string $key)
     {
         if (array_key_exists($key, $this->ocache)) {
             return $this->ocache[$key];
         }
     }
 
-    function putToOCache($key, $object)
+    /**
+     * @param string $key
+     * @param mixed $object
+     */
+    function putToOCache(string $key, mixed $object)
     {
         $this->ocache[$key]=$object;
     }

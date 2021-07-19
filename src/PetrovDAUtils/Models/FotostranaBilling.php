@@ -2,14 +2,18 @@
 namespace PetrovDAUtils\Models;
 
 use PetrovDAUtils\FotostranaError;
+use PetrovDAUtils\Enums\FotostranaEnumsProtocol;
 
 class FotostranaBilling extends FotostranaObject
 {
     const PREBUY_SUCCESS = 'success';
     const PREBUY_ERROR = 'error';
 
-
-    public function withdrawMoneySafe($amount)
+    /**
+     * @param float $amount
+     * @return bool
+     */
+    public function withdrawMoneySafe(float $amount)
     {
         $response['id'] = isset($_REQUEST['item']) ? $_REQUEST['item'] : '';
         $response['message'] = isset($_REQUEST['result']) ? $_REQUEST['result'] : self::PREBUY_ERROR;
@@ -17,35 +21,36 @@ class FotostranaBilling extends FotostranaObject
         if ($response['message'] != self::PREBUY_SUCCESS)
         {
             $this->lastError = new FotostranaError('Billing',"Prebuy action was not success.");
-            return null;
+            return false;
         }
 
         try
         {
             $r = $this->request();
             $r->setMethod('Billing.withDrawMoneySafe');
-            $r->setParam('userId', FOTOSTRANA_VIEWER_ID);
-            $r->setParam('money', $amount);
+            $r->setParam(FotostranaEnumsProtocol::USER_ID, FOTOSTRANA_VIEWER_ID);
+            $r->setParam(FotostranaEnumsProtocol::MONEY, $amount);
+            $r->setMode('POST');
             $r->disallowCache();
             $apiresult = $r->get();
             $r->restoreCache();
 
             if (!isset($apiresult['response']['transferred']) || $apiresult['response']['transferred']<>$amount) {
-                // Возникла ошибка - возвращаем инйормацию по ошибке
-                $this->lastError = new FotostranaError('Billing',"Billing problem: ".serialize($apiresult));
-                return null;
+                throw new FotostranaError('Billing',"Billing problem: ".serialize($apiresult));
             } else {
-                // Все хорошо - ничего не возвращаем
                 return true;
             }
         }
         catch (FotostranaError $e)
         {
             $this->lastError = $e;
-            return null;
+            return false;
         }
     }
 
+    /**
+     * @return float|null
+     */
     public function getAppBalance()
     {
         try
@@ -57,11 +62,9 @@ class FotostranaBilling extends FotostranaObject
             $r->restoreCache();
 
             if (isset($apiresult['response']['balance'])) {
-                return $apiresult['response']['balance'];
+                return (float) $apiresult['response']['balance'];
             } else {
-                // Возникла ошибка - возвращаем инйормацию по ошибке
-                $this->lastError = new FotostranaError('Billing',"Billing problem: No correct result found.");
-                return null;
+                throw new FotostranaError('Billing',"Billing problem: No correct result found.");
             }
         }
         catch (FotostranaError $e)

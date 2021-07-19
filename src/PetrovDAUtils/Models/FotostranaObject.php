@@ -14,6 +14,7 @@ abstract class FotostranaObject extends FotostranaBase
     public $lastError = null;
     protected $data = array();
 
+    /** @return FotostranaRequest */
     function request()
     {
         if (!$this->getFromOCache('request')) {

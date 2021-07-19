@@ -4,6 +4,7 @@ namespace PetrovDAUtils\Models;
 use PetrovDAUtils\Request\FotostranaSubRequest;
 /**
  * TODO: need to check for what this api interface? Should it be a apr of billing obj?
+ * @deprecated
  */
 class FotostranaMobileApi extends FotostranaObject
 {

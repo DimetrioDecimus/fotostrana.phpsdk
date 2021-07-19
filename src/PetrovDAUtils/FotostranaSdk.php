@@ -54,6 +54,7 @@ class FotostranaSdk
         return $this->cache['users'][$user_id];
     }
 
+    /** @deprecated  */
     function getWall($user_id)
     {
         if (!$this->isExecutable) return null;
@@ -72,6 +73,7 @@ class FotostranaSdk
         return $this->cache['billing'];
     }
 
+    /** @deprecated  */
     function getExchange()
     {
         if (!$this->isExecutable) return null;
