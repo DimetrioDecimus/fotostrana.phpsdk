@@ -1,17 +1,18 @@
 <?php
 namespace PetrovDAUtils\Models;
 
-use PetrovDAUtils\Request\FotostranaSubRequest;
+use PetrovDAUtils\Enums\EnumsConfig;
+use PetrovDAUtils\Request\SubRequest;
 /**
  * TODO: need to check for what this api interface? Should it be a apr of billing obj?
  * @deprecated
  */
-class FotostranaMobileApi extends FotostranaObject
+class ModelMobileApi extends ModelAbstractObject
 {
 
     public function buyItem($name, $amount, $item_id, $currency_names, $pic_url, $return, $exchange = null)
     {
-        if ($exchange === null) $exchange = FOTOSTRANA_EXCHANGE;
+        if ($exchange === null) $exchange = EnumsConfig::FOTOSTRANA_EXCHANGE;
 
         $params = array();
         $params['method'] = 'MobEvents.buyItem';
@@ -25,7 +26,7 @@ class FotostranaMobileApi extends FotostranaObject
         if ($return !== null)
             $params['return'] = $return;
 
-        $r = new FotostranaSubRequest();
+        $r = new SubRequest();
         $url = $r->makeApiRequestUrl($params);
         return $this->modifyUrlForMobileApi($url);
     }
@@ -37,7 +38,7 @@ class FotostranaMobileApi extends FotostranaObject
         $params['amount'] = $amount;
         $params['return'] = $return;
 
-        $r = new FotostranaSubRequest();
+        $r = new SubRequest();
         $url = $r->makeApiRequestUrl($params);
         return $this->modifyUrlForMobileApi($url);
     }
@@ -49,7 +50,7 @@ class FotostranaMobileApi extends FotostranaObject
         $params['request_permission'] = $request_permission;
         $params['return'] = $return;
 
-        $r = new FotostranaSubRequest();
+        $r = new SubRequest();
         $url = $r->makeApiRequestUrl($params);
         return $this->modifyUrlForMobileApi($url);
     }
@@ -63,7 +64,7 @@ class FotostranaMobileApi extends FotostranaObject
         $params['params'] = $optParams;
         $params['return'] = $return;
 
-        $r = new FotostranaSubRequest();
+        $r = new SubRequest();
         $url = $r->makeApiRequestUrl($params);
         return $this->modifyUrlForMobileApi($url);
     }
@@ -71,6 +72,6 @@ class FotostranaMobileApi extends FotostranaObject
     private function modifyUrlForMobileApi(string $url)
     {
         $count = 1;
-        return str_replace(FOTOSTRANA_API_BASEURL, FOTOSTRANA_MOBILE_CUSTOMIZE_PAGE, $url, $count);
+        return str_replace(EnumsConfig::FOTOSTRANA_API_BASEURL, EnumsConfig::FOTOSTRANA_MOBILE_CUSTOMIZE_PAGE, $url, $count);
     }
 }

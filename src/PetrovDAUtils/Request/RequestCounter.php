@@ -2,10 +2,12 @@
 namespace PetrovDAUtils\Request;
 
 
+use PetrovDAUtils\Enums\EnumsConfig;
+
 /**
  * Вспомогательный класс подсчёта количества запросов, чтобы соблюдать ограничения API Фотостраны
  */
-class FotostranaRequestsCounter
+class RequestCounter
 {
     static private $queries=array();
 
@@ -38,9 +40,9 @@ class FotostranaRequestsCounter
 
     static function wait()
     {
-        if (FOTOSTRANA_DEBUG) { echo ("Query timeout check: query count ".self::countQueries().", max queries ".self::MAX_QUERIES." <br>\n"); }
+        if (EnumsConfig::FOTOSTRANA_DEBUG) { echo ("Query timeout check: query count ".self::countQueries().", max queries ".self::MAX_QUERIES." <br>\n"); }
         while (self::countQueries() >= self::MAX_QUERIES) {
-            if (FOTOSTRANA_DEBUG) { echo ("MAX_QUERIES reached (query count ".self::countQueries()."), wait..<br/>\n"); }
+            if (EnumsConfig::FOTOSTRANA_DEBUG) { echo ("MAX_QUERIES reached (query count ".self::countQueries()."), wait..<br/>\n"); }
             self::agingQueries();
             sleep(1);
         }

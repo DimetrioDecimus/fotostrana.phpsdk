@@ -1,13 +1,13 @@
 <?php
 namespace PetrovDAUtils\Models;
 
-use PetrovDAUtils\Enums\FotostranaEnumsProtocol;
+use PetrovDAUtils\Enums\EnumsProtocol;
 use PetrovDAUtils\FotostranaError;
 
 /**
  * Класс объекта-пользователя
  */
-class FotostranaUser extends FotostranaObject
+class ModelUser extends ModelAbstractObject
 {
 
     private $user_id;
@@ -19,8 +19,8 @@ class FotostranaUser extends FotostranaObject
         {
             $r = $this->request();
             $r->setMethod('User.getProfiles');
-            $r->setParam(FotostranaEnumsProtocol::USER_IDS, $this->user_id);
-            $r->setParam(FotostranaEnumsProtocol::FIELDS,'user_name,user_lastname,user_link,sex,birthday,photo_small,photo_97,photo_192,photo_big,photo_box,city_id,city_name,slogan,vip_end,is_payable');
+            $r->setParam(EnumsProtocol::USER_IDS, $this->user_id);
+            $r->setParam(EnumsProtocol::FIELDS,'user_name,user_lastname,user_link,sex,birthday,photo_small,photo_97,photo_192,photo_big,photo_box,city_id,city_name,slogan,vip_end,is_payable');
             $apiresult = $r->get();
 
             if ($apiresult['response'][$this->user_id]) {
@@ -100,7 +100,7 @@ class FotostranaUser extends FotostranaObject
         if (!array_key_exists('registrationDate',$this->data)) {
             $r = $this->request();
             $r->setMethod('User.getRegistrationDate');
-            $r->setParam(FotostranaEnumsProtocol::USER_ID, $this->user_id);
+            $r->setParam(EnumsProtocol::USER_ID, $this->user_id);
             $apiresult = $r->get();
             $this->data['registrationDate'] = $apiresult['response'];
         }
@@ -112,7 +112,7 @@ class FotostranaUser extends FotostranaObject
         if (!array_key_exists('friends',$this->data) || true) {
             $r = $this->request();
             $r->setMethod('User.getFriendsAny');
-            $r->setParam(FotostranaEnumsProtocol::USER_ID, $this->user_id);
+            $r->setParam(EnumsProtocol::USER_ID, $this->user_id);
             $apiresult = $r->get();
             $this->data['friends'] = $apiresult['response'];
         }
@@ -126,7 +126,7 @@ class FotostranaUser extends FotostranaObject
             $this->data['friends_objects'] = array();
             if (is_array($friends)) {
                 foreach ($friends as $friend_id) {
-                    $this->data['friends_objects'][] = new FotostranaUser($friend_id);
+                    $this->data['friends_objects'][] = new ModelUser($friend_id);
                 }
             }
         }
@@ -138,7 +138,7 @@ class FotostranaUser extends FotostranaObject
         if (!array_key_exists('isAppWidgetUser',$this->data)) {
             $r = $this->request();
             $r->setMethod('User.isAppWidgetUser');
-            $r->setParam(FotostranaEnumsProtocol::USER_ID, $this->user_id);
+            $r->setParam(EnumsProtocol::USER_ID, $this->user_id);
             $apiresult = $r->get();
             $this->data['isAppWidgetUser'] = $apiresult['response'];
         }
@@ -150,7 +150,7 @@ class FotostranaUser extends FotostranaObject
         if (!array_key_exists('settings',$this->data)) {
             $r = $this->request();
             $r->setMethod('User.getUserSettingsAny');
-            $r->setParam(FotostranaEnumsProtocol::USER_ID, $this->user_id);
+            $r->setParam(EnumsProtocol::USER_ID, $this->user_id);
             $apiresult = $r->get();
             $this->data['settings'] = $apiresult['response'];
         }
@@ -161,9 +161,9 @@ class FotostranaUser extends FotostranaObject
     {
         $r = $this->request();
         $r->setMethod('User.sendNotification');
-        $r->setParam(FotostranaEnumsProtocol::USER_IDS,$this->user_id);
-        $r->setParam(FotostranaEnumsProtocol::TEXT,$text);
-        $r->setParam(FotostranaEnumsProtocol::PARAMS,$params);
+        $r->setParam(EnumsProtocol::USER_IDS,$this->user_id);
+        $r->setParam(EnumsProtocol::TEXT,$text);
+        $r->setParam(EnumsProtocol::PARAMS,$params);
         $apiresult = $r->get();
         return $apiresult;
     }
@@ -173,8 +173,8 @@ class FotostranaUser extends FotostranaObject
     {
         $r = $this->request();
         $r->setMethod('User.giveAchievment');
-        $r->setParam(FotostranaEnumsProtocol::USER_ID,$this->user_id);
-        $r->setParam(FotostranaEnumsProtocol::ACHIEVE_ID,$achievment_id);
+        $r->setParam(EnumsProtocol::USER_ID,$this->user_id);
+        $r->setParam(EnumsProtocol::ACHIEVE_ID,$achievment_id);
         $apiresult = $r->get();
         return $apiresult;
     }
@@ -184,7 +184,7 @@ class FotostranaUser extends FotostranaObject
     {
         $r = $this->request();
         $r->setMethod('User.getMarketDiscount');
-        $r->setParam(FotostranaEnumsProtocol::USER_ID,$this->user_id);
+        $r->setParam(EnumsProtocol::USER_ID,$this->user_id);
         $apiresult = $r->get();
         if (isset($apiresult['response'])) {
             return $apiresult['response'];

@@ -4,7 +4,7 @@
 namespace PetrovDAUtils\Enums;
 
 
-class FotostranaEnumsProtocol
+class EnumsProtocol
 {
     const USER_ID = 'userId',
         MONEY     = 'money',

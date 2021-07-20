@@ -3,10 +3,10 @@ namespace PetrovDAUtils\Models;
 /**
  * Класс базовых операций низкого уровня (кэширование php-объектов и т.д.)
  */
-abstract class FotostranaBase
+abstract class ModelAbstractBase
 {
 
-    /** @var FotostranaObject[]  */
+    /** @var ModelAbstractObject[]  */
     protected $ocache = array(); // кэш объектов php
 
     /**

@@ -1,12 +1,13 @@
 <?php
 namespace PetrovDAUtils\Request;
 
+use PetrovDAUtils\Enums\EnumsConfig;
 use PetrovDAUtils\FotostranaError;
 
 /**
  * Класс, формирующий запросы к API
  */
-class FotostranaRequest
+class RequestBase
 {
 
     private $mode='GET';
@@ -18,17 +19,17 @@ class FotostranaRequest
     private $cache_allowed = true;
     private $old_cache_state = null;
     private $error;
+    private $logDir  = '/log/';
+    private $logFileName = 'requests.log';
+    private $logFilePath;
 
     function __construct()
     {
-
-        if (!defined('FOTOSTRANA_REQUEST_LOG')) {
-            define('FOTOSTRANA_REQUEST_LOG', dirname(__FILE__).'/requests.log');
-        }
-
         $this->flushResult();
-        $this->cache = new FotostranaRequestsCache();
-
+        $this->cache = new RequestCache();
+        $this->logDir = dirname(__FILE__) . $this->logDir;
+        if (!is_dir($this->logDir)) mkdir($this->logDir, 0777, true);
+        if ($this->logDir) $this->logFilePath = $this->logDir . $this->logFileName;
     }
 
     function setMethod($method)
@@ -120,24 +121,24 @@ class FotostranaRequest
     {
 
         // готовим запрос
-        $r = new FotostranaSubRequest();
+        $r = new SubRequest();
         $p = array_merge($this->params, array('method'=>$this->method));
 
         if ($this->cache_allowed && $cached_result = $this->cache->loadCache($p)) {
             $this->result_raw = $cached_result;
-            if (FOTOSTRANA_REQUEST_LOG && FOTOSTRANA_REQUESTS_LOGGER_ENABLED) {
-                file_put_contents(FOTOSTRANA_REQUEST_LOG, date('r').' cache: '.$this->method.' '.serialize($this->params).' '.serialize($cached_result)."\n\n", FILE_APPEND);
+            if ($this->logFilePath && EnumsConfig::FOTOSTRANA_REQUESTS_LOGGER_ENABLED) {
+                file_put_contents($this->logFilePath, date('r').' cache: '.$this->method.' '.serialize($this->params).' '.serialize($cached_result)."\n\n", FILE_APPEND);
             }
             return;
         }
 
         // делаем паузу, чтобы соблюдать требование MAX_QUERIES PER_TIME
-        FotostranaRequestsCounter::addQuery();
-        FotostranaRequestsCounter::wait();
+        RequestCounter::addQuery();
+        RequestCounter::wait();
 
         $url = $r->makeApiRequestUrl( $p );
 
-        if (FOTOSTRANA_DEBUG) { echo "Fetching URL ".htmlspecialchars($url)." by ".$this->mode."<br>\n"; }
+        if (EnumsConfig::FOTOSTRANA_DEBUG) { echo "Fetching URL ".htmlspecialchars($url)." by ".$this->mode."<br>\n"; }
 
         // делаем запрос
         if (strtoupper($this->mode)=='GET') {
@@ -155,15 +156,15 @@ class FotostranaRequest
             curl_close($ch);
         }
 
-        if (FOTOSTRANA_REQUEST_LOG && FOTOSTRANA_REQUESTS_LOGGER_ENABLED) {
-            file_put_contents(FOTOSTRANA_REQUEST_LOG, date('r').' request: '.$this->method.' '.serialize($this->params).' '.$this->result_raw."\n\n", FILE_APPEND);
+        if ($this->logFilePath && EnumsConfig::FOTOSTRANA_REQUESTS_LOGGER_ENABLED) {
+            file_put_contents($this->logFilePath, date('r').' request: '.$this->method.' '.serialize($this->params).' '.$this->result_raw."\n\n", FILE_APPEND);
         }
 
         if ($this->cache_allowed) {
             $this->cache->storeCache($p, $this->result_raw);
         }
 
-        if (FOTOSTRANA_DEBUG) { var_dump($this->result_raw); }
+        if (EnumsConfig::FOTOSTRANA_DEBUG) { var_dump($this->result_raw); }
     }
 
     private function flushResult()

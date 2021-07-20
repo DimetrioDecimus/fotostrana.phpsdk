@@ -3,22 +3,22 @@ namespace PetrovDAUtils\Models;
 
 use PetrovDAUtils\FotostranaError;
 
-use PetrovDAUtils\Request\FotostranaRequest;
+use PetrovDAUtils\Request\RequestBase;
 
 /**
  * Класс абстрактного объекта API Фотостраны (пользователя, изображения, стены и т.д.)
  */
-abstract class FotostranaObject extends FotostranaBase
+abstract class ModelAbstractObject extends ModelAbstractBase
 {
 
     public $lastError = null;
     protected $data = array();
 
-    /** @return FotostranaRequest */
+    /** @return RequestBase */
     function request()
     {
         if (!$this->getFromOCache('request')) {
-            $this->putToOCache('request',new FotostranaRequest());
+            $this->putToOCache('request',new RequestBase());
         }
         return $this->getFromOCache('request');
     }

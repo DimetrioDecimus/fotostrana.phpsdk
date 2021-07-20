@@ -1,11 +1,13 @@
 <?php
 namespace PetrovDAUtils\Request;
 
+use PetrovDAUtils\Enums\EnumsConfig;
+
 /**
  * Класс, реализующий кэширование запросов к API
  * Пользователь SDK может переопределить методы хранения данных, например в MySQL
  */
-class FotostranaRequestsCache
+class RequestCache
 {
 
     private $cache_dir;
@@ -31,7 +33,7 @@ class FotostranaRequestsCache
         if ($params) {
             $f = $this->cache_dir . $this->makeCacheKey($params);
             if (file_exists($f)) {
-                if (filemtime($f) < (time() - FOTOSTRANA_REQUESTS_CACHE_TIMEOUT)) {
+                if (filemtime($f) < (time() - EnumsConfig::FOTOSTRANA_REQUESTS_CACHE_TIMEOUT)) {
                     @unlink($f);
                 } else {
                     return $this->decryptData(file_get_contents($f));

@@ -1,10 +1,11 @@
 <?php
 namespace PetrovDAUtils\Models;
 
+use PetrovDAUtils\Enums\EnumsRequest;
 use PetrovDAUtils\FotostranaError;
-use PetrovDAUtils\Enums\FotostranaEnumsProtocol;
+use PetrovDAUtils\Enums\EnumsProtocol;
 
-class FotostranaBilling extends FotostranaObject
+class ModelBilling extends ModelAbstractObject
 {
     const PREBUY_SUCCESS = 'success';
     const PREBUY_ERROR = 'error';
@@ -28,8 +29,8 @@ class FotostranaBilling extends FotostranaObject
         {
             $r = $this->request();
             $r->setMethod('Billing.withDrawMoneySafe');
-            $r->setParam(FotostranaEnumsProtocol::USER_ID, FOTOSTRANA_VIEWER_ID);
-            $r->setParam(FotostranaEnumsProtocol::MONEY, $amount);
+            $r->setParam(EnumsProtocol::USER_ID, EnumsRequest::$viewerId);
+            $r->setParam(EnumsProtocol::MONEY, $amount);
             $r->setMode('POST');
             $r->disallowCache();
             $apiresult = $r->get();

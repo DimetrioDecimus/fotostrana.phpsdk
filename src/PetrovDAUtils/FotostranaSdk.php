@@ -1,21 +1,23 @@
 <?php
 namespace PetrovDAUtils;
 
+//Enums
+use PetrovDAUtils\Enums\EnumsConfig;
+
 // Models
-use PetrovDAUtils\Models\FotostranaUser;
-use PetrovDAUtils\Models\FotostranaBilling;
-use PetrovDAUtils\Models\FotostranaWall;
-use PetrovDAUtils\Models\FotostranaMobileApi;
+use PetrovDAUtils\Models\ModelUser;
+use PetrovDAUtils\Models\ModelBilling;
+use PetrovDAUtils\Models\ModelWall;
+use PetrovDAUtils\Models\ModelMobileApi;
 
 // Request
-use PetrovDAUtils\Request\FotostranaRequest;
+use PetrovDAUtils\Request\RequestBase;
 
 /**
  * Основной класс Fotostrana SDK
  */
 class FotostranaSdk
 {
-
     private $cache = array();
     public $isExecutable = true;
     public $lastError = null;
@@ -34,14 +36,6 @@ class FotostranaSdk
             return;
         }
 
-        if (!defined('FOTOSTRANA_DEBUG')) {
-            define('FOTOSTRANA_DEBUG', 0);
-        }
-
-        if (!defined('FOTOSTRANA_API_BASEURL')) {
-            define('FOTOSTRANA_API_BASEURL','http://fotostrana.ru/apifs.php');
-        }
-
         $this->flushCache();
     }
 
@@ -49,7 +43,7 @@ class FotostranaSdk
     {
         if (!$this->isExecutable) return null;
         if (!array_key_exists($user_id, $this->cache['users'])) {
-            $this->cache['users'][$user_id] = new FotostranaUser($user_id);
+            $this->cache['users'][$user_id] = new ModelUser($user_id);
         }
         return $this->cache['users'][$user_id];
     }
@@ -59,7 +53,7 @@ class FotostranaSdk
     {
         if (!$this->isExecutable) return null;
         if (!array_key_exists($user_id, $this->cache['walls'])) {
-            $this->cache['walls'][$user_id] = new FotostranaWall($user_id);
+            $this->cache['walls'][$user_id] = new ModelWall($user_id);
         }
         return $this->cache['walls'][$user_id];
     }
@@ -68,7 +62,7 @@ class FotostranaSdk
     {
         if (!$this->isExecutable) return null;
         if (!$this->cache['billing']) {
-            $this->cache['billing'] = new FotostranaBilling();
+            $this->cache['billing'] = new ModelBilling();
         }
         return $this->cache['billing'];
     }
@@ -78,7 +72,7 @@ class FotostranaSdk
     {
         if (!$this->isExecutable) return null;
         if (!$this->cache['exchange']) {
-            $this->cache['exchange'] = new FotostranaMobileApi();
+            $this->cache['exchange'] = new ModelMobileApi();
         }
         return $this->cache['exchange'];
     }
@@ -90,7 +84,7 @@ class FotostranaSdk
             return $this->cache['search']['prefix'.serialize($params)];
         } else {
 
-            $r = new FotostranaRequest();
+            $r = new RequestBase();
             $r->setMethod('User.getFromSearch');
             $r->setParams($params);
             $apiresult = $r->get();
@@ -154,8 +148,12 @@ class FotostranaSdk
 
         $t = true;
 
-        $ourAuth = md5(FOTOSTRANA_APPID.'_'.FOTOSTRANA_VIEWER_ID.'_'.FOTOSTRANA_SERVERKEY);
-        if (FOTOSTRANA_AUTH_KEY_CHECK && (FOTOSTRANA_AUTH_KEY === null || FOTOSTRANA_AUTH_KEY != $ourAuth))
+        define('FOTOSTRANA_SESSION_KEY', $_REQUEST['sessionKey'] ?? null);
+        define('FOTOSTRANA_VIEWER_ID',   $_REQUEST['viewerId'] ?? null);
+        define('FOTOSTRANA_AUTH_KEY',    $_REQUEST['authKey'] ?? null);
+
+        $ourAuth = md5(EnumsConfig::FOTOSTRANA_APPID.'_'.FOTOSTRANA_VIEWER_ID.'_'.EnumsConfig::FOTOSTRANA_SERVERKEY);
+        if (EnumsConfig::FOTOSTRANA_AUTH_KEY_CHECK && (FOTOSTRANA_AUTH_KEY === null || FOTOSTRANA_AUTH_KEY != $ourAuth))
         {
             $t = false;
         }

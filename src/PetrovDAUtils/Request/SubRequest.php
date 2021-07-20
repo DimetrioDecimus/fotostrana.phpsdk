@@ -1,10 +1,11 @@
 <?php
 namespace PetrovDAUtils\Request;
 
+use PetrovDAUtils\Enums\EnumsConfig;
 /**
  * Подкласс, формирующий URL и SIG для запроса к API
  */
-class FotostranaSubRequest
+class SubRequest
 {
     // TODO: check need such array
     private $server_methods = array(
@@ -47,12 +48,12 @@ class FotostranaSubRequest
         }
 
         if (in_array($params['method'],$this->server_methods)) {
-            $p_string.=FOTOSTRANA_SERVERKEY;
+            $p_string.=EnumsConfig::FOTOSTRANA_SERVERKEY;
         } else {
-            $p_string.=FOTOSTRANA_CLIENTKEY;
+            $p_string.=EnumsConfig::FOTOSTRANA_CLIENTKEY;
         }
 
-        if (FOTOSTRANA_DEBUG) { echo "p_string: ".$p_string."<br/><br/>\n"; }
+        if (EnumsConfig::FOTOSTRANA_DEBUG) { echo "p_string: ".$p_string."<br/><br/>\n"; }
 
         $sig = md5($p_string);
         return $sig;
@@ -72,7 +73,7 @@ class FotostranaSubRequest
 
     function makeApiRequestUrl(array $params) {
 
-        if (!array_key_exists('appId',$params))     { $params['appId']=FOTOSTRANA_APPID; }
+        if (!array_key_exists('appId',$params))     { $params['appId']=EnumsConfig::FOTOSTRANA_APPID; }
         if (!array_key_exists('timestamp',$params)) { $params['timestamp']=time(); }
         if (!array_key_exists('format',$params))    { $params['format']=1; }
         if (!array_key_exists('rand',$params))      { $params['rand']=rand(1,999999); }
@@ -84,7 +85,7 @@ class FotostranaSubRequest
         }
 
         ksort($params);
-        $url=FOTOSTRANA_API_BASEURL.'?sig='.$this->makeSig($params);
+        $url= EnumsConfig::FOTOSTRANA_API_BASEURL.'?sig='.$this->makeSig($params);
 
         $e_params = $this->urlencodeArray($params);
         foreach ($e_params as $k=>$v)
@@ -103,7 +104,7 @@ class FotostranaSubRequest
             $url.='&sessionKey='.FOTOSTRANA_SESSION_KEY.'&viewerId='.FOTOSTRANA_VIEWER_ID;
         }*/
 
-        if (FOTOSTRANA_DEBUG) { echo "URL: ".htmlspecialchars($url)."<br/><br/>\n"; }
+        if (EnumsConfig::FOTOSTRANA_DEBUG) { echo "URL: ".htmlspecialchars($url)."<br/><br/>\n"; }
 
         return $url;
 
