@@ -24,7 +24,7 @@ abstract class ModelAbstractBase
      * @param string $key
      * @param mixed $object
      */
-    function putToOCache(string $key, mixed $object)
+    function putToOCache(string $key, $object)
     {
         $this->ocache[$key]=$object;
     }

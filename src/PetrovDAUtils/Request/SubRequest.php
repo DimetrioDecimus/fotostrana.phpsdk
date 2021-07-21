@@ -2,6 +2,8 @@
 namespace PetrovDAUtils\Request;
 
 use PetrovDAUtils\Enums\EnumsConfig;
+use PetrovDAUtils\FotostranaAuthParams;
+
 /**
  * Подкласс, формирующий URL и SIG для запроса к API
  */
@@ -33,7 +35,7 @@ class SubRequest
         if (in_array($params['method'],$this->server_methods)) {
             $p_string='';
         } else {
-            $p_string=FOTOSTRANA_VIEWER_ID;
+            $p_string=FotostranaAuthParams::i()->viewerId();
         }
         foreach ($params as $k=>$v)
         {
@@ -80,8 +82,8 @@ class SubRequest
 
         //TODO: check if we really need ti, all requests are servers
         if (!in_array($params['method'],$this->server_methods)) {
-            $params['sessionKey'] = FOTOSTRANA_SESSION_KEY;
-            $params['viewerId'] = FOTOSTRANA_VIEWER_ID;
+            $params['sessionKey'] = FotostranaAuthParams::i()->sessionKey();
+            $params['viewerId'] = FotostranaAuthParams::i()->viewerId();
         }
 
         ksort($params);
@@ -99,10 +101,6 @@ class SubRequest
                 }
             }
         }
-
-        /*if (!in_array($params['method'],$this->server_methods)) {
-            $url.='&sessionKey='.FOTOSTRANA_SESSION_KEY.'&viewerId='.FOTOSTRANA_VIEWER_ID;
-        }*/
 
         if (EnumsConfig::FOTOSTRANA_DEBUG) { echo "URL: ".htmlspecialchars($url)."<br/><br/>\n"; }
 

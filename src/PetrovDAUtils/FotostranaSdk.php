@@ -118,7 +118,7 @@ class FotostranaSdk
         $this->cache['exchange']=array();
     }
 
-    function selfTest()
+    private function selfTest()
     {
 
         // тестируем текущее окружение
@@ -142,18 +142,15 @@ class FotostranaSdk
 
     }
 
-    function checkAuth()
+    private function checkAuth()
     {
         // Тестируем безопасность
 
         $t = true;
+        $authParams = FotostranaAuthParams::i();
 
-        define('FOTOSTRANA_SESSION_KEY', $_REQUEST['sessionKey'] ?? null);
-        define('FOTOSTRANA_VIEWER_ID',   $_REQUEST['viewerId'] ?? null);
-        define('FOTOSTRANA_AUTH_KEY',    $_REQUEST['authKey'] ?? null);
-
-        $ourAuth = md5(EnumsConfig::FOTOSTRANA_APPID.'_'.FOTOSTRANA_VIEWER_ID.'_'.EnumsConfig::FOTOSTRANA_SERVERKEY);
-        if (EnumsConfig::FOTOSTRANA_AUTH_KEY_CHECK && (FOTOSTRANA_AUTH_KEY === null || FOTOSTRANA_AUTH_KEY != $ourAuth))
+        $ourAuth = md5(EnumsConfig::FOTOSTRANA_APPID.'_'. $authParams->viewerId() .'_'.EnumsConfig::FOTOSTRANA_SERVERKEY);
+        if (EnumsConfig::FOTOSTRANA_AUTH_KEY_CHECK && ($authParams->authKey() === null || $authParams->authKey() != $ourAuth))
         {
             $t = false;
         }
