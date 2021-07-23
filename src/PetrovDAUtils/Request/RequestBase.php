@@ -2,7 +2,12 @@
 namespace PetrovDAUtils\Request;
 
 use PetrovDAUtils\Enums\EnumsConfig;
-use PetrovDAUtils\FotostranaError;
+use PetrovDAUtils\Enums\EnumsProtocol;
+
+use PetrovDAUtils\Model\ModelAuth;
+use PetrovDAUtils\Model\ModelError;
+
+use PetrovDAUtils\Model\ModelRequestResponse;
 
 /**
  * Класс, формирующий запросы к API
@@ -10,21 +15,21 @@ use PetrovDAUtils\FotostranaError;
 class RequestBase
 {
 
-    private $mode='GET';
+    private $mode= EnumsProtocol::HTTP_QUERY_GET;
     private $method;
-    private $params=array();
+    private $params = [];
     private $result_raw;
-    private $result_formatted;
     private $cache;
     private $cache_allowed = true;
     private $old_cache_state = null;
-    private $error;
     private $logDir  = '/log/';
     private $logFileName = 'requests.log';
     private $logFilePath;
+    private $authParams;
 
-    function __construct()
+    function __construct(ModelAuth $authParams)
     {
+        $this->authParams = $authParams;
         $this->flushResult();
         $this->cache = new RequestCache();
         $this->logDir = dirname(__FILE__) . $this->logDir;
@@ -32,96 +37,74 @@ class RequestBase
         if ($this->logDir) $this->logFilePath = $this->logDir . $this->logFileName;
     }
 
+    /**
+     * @param $method
+     * @return $this
+     */
     function setMethod($method)
     {
         $this->flushResult();
         $this->method=$method;
+        return $this;
     }
 
+    /**
+     * @param $name
+     * @param $value
+     * @return $this
+     */
     function setParam($name,$value)
     {
-        if ($value) {
-            $this->params[$name] = $value;
-        }
+        if ($value) $this->params[$name] = $value;
+        return $this;
     }
 
-    function setParams($params=array())
-    {
-        $this->params=$params;
-    }
-
+    /**
+     * Now awailable GET | POST
+     * @param $mode
+     * @return $this
+     */
     function setMode($mode)
     {
-        if (strtoupper($mode)=='GET') {
-            $this->mode='GET';
-        } else {
-            $this->mode='POST';
-        }
+        $this->mode = strtoupper($mode)==EnumsProtocol::HTTP_QUERY_GET ? EnumsProtocol::HTTP_QUERY_GET : EnumsProtocol::HTTP_QUERY_POST;
+        return $this;
     }
 
-    function allowCache()
+    /**
+     * @return $this
+     */
+    function setCache(bool $toSet)
     {
         $this->old_cache_state = $this->cache_allowed;
-        $this->cache_allowed = true;
+        $this->cache_allowed = $toSet;
+        return $this;
     }
 
-    function disallowCache()
-    {
-        $this->old_cache_state = $this->cache_allowed;
-        $this->cache_allowed = false;
-    }
-
+    /**
+     * @return $this
+     */
     function restoreCache()
     {
-        if ($this->old_cache_state === null) return;
-        if ($this->old_cache_state) $this->allowCache();
-            else $this->disallowCache();
+        if ($this->old_cache_state === null) return $this;
+        $this->setCache($this->old_cache_state);
         $this->old_cache_state = null;
+        return $this;
     }
 
-    function get()
+    /**
+     * @return ModelRequestResponse
+     * @throws ModelError
+     */
+    function sendRequest()
     {
-        if (!$this->result_formatted) {
-            $this->runRequest();
-            $this->formatResult();
-        }
-        $r = $this->result_formatted;
-        return $r;
-    }
-
-    function getError()
-    {
-        return $this->error;
-    }
-
-    private function formatResult()
-    {
-        if ($this->result_raw) {
-
-            $this->result_formatted = json_decode($this->result_raw, true);
-
-            if (array_key_exists('error',$this->result_formatted)) {
-                $this->error = $this->result_formatted['error'];
-                throw new FotostranaError('API Request error', 'Error: '. (isset($this->error['error_subcode']) ? $this->error['error_subcode'].' (subcode)' : $this->error['error_code'].' (code)') . ': ' . $this->error['error_msg']);
-            }
-
-            if (!array_key_exists('response',$this->result_formatted)) {
-                $this->error = $this->result_formatted['error'];
-                throw new FotostranaError('API Request error', 'Invalid API response: no response field');
-            }
-
-        }
-        else
-        {
-            throw new FotostranaError('API Request error', 'Empty API response');
-        }
+        $this->runRequest();
+        return new ModelRequestResponse($this->result_raw);
     }
 
     private function runRequest()
     {
-
         // готовим запрос
-        $r = new SubRequest();
+        $r = new SubRequest($this->authParams);
         $p = array_merge($this->params, array('method'=>$this->method));
 
         if ($this->cache_allowed && $cached_result = $this->cache->loadCache($p)) {
@@ -141,7 +124,7 @@ class RequestBase
         if (EnumsConfig::FOTOSTRANA_DEBUG) { echo "Fetching URL ".htmlspecialchars($url)." by ".$this->mode."<br>\n"; }
 
         // делаем запрос
-        if (strtoupper($this->mode)=='GET') {
+        if (strtoupper($this->mode)==EnumsProtocol::HTTP_QUERY_GET) {
             $this->result_raw =  file_get_contents($url);
         } else {
             $ch = curl_init();
@@ -165,17 +148,16 @@ class RequestBase
         }
 
         if (EnumsConfig::FOTOSTRANA_DEBUG) { var_dump($this->result_raw); }
+
     }
 
     private function flushResult()
     {
         $this->method = false;
-        $this->params = array();
+        $this->params = [];
         $this->result_raw = false;
-        $this->result_formatted = false;
-        $this->error = false;
-        $this->mode='GET';
-        $this->allowCache();
+        $this->mode=EnumsProtocol::HTTP_QUERY_GET;
+        $this->setCache(true);
     }
 
 }

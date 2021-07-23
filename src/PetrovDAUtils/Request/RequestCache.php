@@ -9,7 +9,6 @@ use PetrovDAUtils\Enums\EnumsConfig;
  */
 class RequestCache
 {
-
     private $cache_dir;
 
     function __construct()
@@ -28,28 +27,35 @@ class RequestCache
         }
     }
 
+    /**
+     * @param $params
+     * @return mixed|null
+     */
     function loadCache($params)
     {
-        if ($params) {
-            $f = $this->cache_dir . $this->makeCacheKey($params);
-            if (file_exists($f)) {
-                if (filemtime($f) < (time() - EnumsConfig::FOTOSTRANA_REQUESTS_CACHE_TIMEOUT)) {
-                    @unlink($f);
-                } else {
-                    return $this->decryptData(file_get_contents($f));
-                }
-            }
+        if (!$params) return null;
+        $f = $this->cache_dir . $this->makeCacheKey($params);
+        if (!file_exists($f)) return null;
+        if (filemtime($f) < (time() - EnumsConfig::FOTOSTRANA_REQUESTS_CACHE_TIMEOUT)) {
+            @unlink($f);
+            return null;
         }
+
+        return $this->decryptData(file_get_contents($f));
     }
 
+    /**
+     * @param $params
+     * @return string
+     */
     private function makeCacheKey($params)
     {
-        if ($params) {
-            // убираем всякие рандомные параметры
-            unset($params['timestamp']);
-            unset($params['rand']);
-            return md5(serialize($params));
-        }
+        if (!$params) return '';
+
+        // убираем всякие рандомные параметры
+        unset($params['timestamp']);
+        unset($params['rand']);
+        return md5(serialize($params));
     }
 
     // пользователь может добавить шифрование и дешифрование данных по вкусу

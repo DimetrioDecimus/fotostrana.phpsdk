@@ -2,7 +2,9 @@
 namespace PetrovDAUtils\Request;
 
 use PetrovDAUtils\Enums\EnumsConfig;
-use PetrovDAUtils\FotostranaAuthParams;
+use PetrovDAUtils\Enums\EnumsProtocol;
+
+use PetrovDAUtils\Model\ModelAuth;
 
 /**
  * Подкласс, формирующий URL и SIG для запроса к API
@@ -11,15 +13,11 @@ class SubRequest
 {
     // TODO: check need such array
     private $server_methods = array(
-        // TODO: there is no such method in api
-        'User.giveFBAchievment',
         'User.sendNotification',
         // TODO: watch about mail system for apps
         'User.sendAppEmail',
         // TODO: strange achive system
         'User.giveAchievment',
-        // TODO: no such method
-        'User.getAuthInfo',
 
         'Userphoto.checkAccess',
 
@@ -30,36 +28,33 @@ class SubRequest
         // добавьте методы при необходимости
     );
 
+    /** @var ModelAuth */
+    private $authParams;
+
+    public function __construct(ModelAuth $authParams)
+    {
+        $this->authParams = $authParams;
+    }
+
     private function makeSig(array $params) {
         ksort($params);
-        if (in_array($params['method'],$this->server_methods)) {
-            $p_string='';
-        } else {
-            $p_string=FotostranaAuthParams::i()->viewerId();
-        }
+        $p_string = '';
+        if (!in_array($params['method'],$this->server_methods)) $p_string= $this->authParams->viewerId();
+
         foreach ($params as $k=>$v)
         {
             if ($k && $v) {
-                if (is_array($v)) {
-                    $p_string .= str_replace('&', '', urldecode(http_build_query(array($k => $v))));
-                }
-                else {
-                    $p_string .= $k . '=' . $v;
-                }
+                $p_string .= is_array($v) ? str_replace('&', '', urldecode(http_build_query([$k => $v])))
+                                          : $k . '=' . $v;
             }
         }
 
-        if (in_array($params['method'],$this->server_methods)) {
-            $p_string.=EnumsConfig::FOTOSTRANA_SERVERKEY;
-        } else {
-            $p_string.=EnumsConfig::FOTOSTRANA_CLIENTKEY;
-        }
+        $p_string.= in_array($params['method'],$this->server_methods) ? EnumsConfig::FOTOSTRANA_SERVERKEY
+                                                                      : EnumsConfig::FOTOSTRANA_CLIENTKEY;
 
         if (EnumsConfig::FOTOSTRANA_DEBUG) { echo "p_string: ".$p_string."<br/><br/>\n"; }
 
-        $sig = md5($p_string);
-        return $sig;
-
+        return  md5($p_string);
     }
 
     function urlencodeArray($params)
@@ -67,23 +62,23 @@ class SubRequest
         $res = array();
         foreach ($params as $key=>$value)
         {
-            if (is_array($value)) $res[$key] = $this->urlencodeArray($value);
-            else $res[$key] = urlencode($value);
+            $res[$key] = is_array($value) ? $this->urlencodeArray($value)
+                                          : urlencode($value);
         }
         return $res;
     }
 
     function makeApiRequestUrl(array $params) {
 
-        if (!array_key_exists('appId',$params))     { $params['appId']=EnumsConfig::FOTOSTRANA_APPID; }
-        if (!array_key_exists('timestamp',$params)) { $params['timestamp']=time(); }
-        if (!array_key_exists('format',$params))    { $params['format']=1; }
-        if (!array_key_exists('rand',$params))      { $params['rand']=rand(1,999999); }
+        if (!array_key_exists(EnumsProtocol::APP_ID,$params))     { $params[EnumsProtocol::APP_ID] = EnumsConfig::FOTOSTRANA_APPID; }
+        if (!array_key_exists(EnumsProtocol::TIMESTAMP,$params))  { $params[EnumsProtocol::TIMESTAMP] =  time(); }
+        if (!array_key_exists(EnumsProtocol::FORMAT,$params))     { $params[EnumsProtocol::FORMAT] = 1; }
+        if (!array_key_exists(EnumsProtocol::RAND,$params))       { $params[EnumsProtocol::RAND]=rand(1,999999); }
 
         //TODO: check if we really need ti, all requests are servers
-        if (!in_array($params['method'],$this->server_methods)) {
-            $params['sessionKey'] = FotostranaAuthParams::i()->sessionKey();
-            $params['viewerId'] = FotostranaAuthParams::i()->viewerId();
+        if (!in_array($params[EnumsProtocol::METHOD],$this->server_methods)) {
+            $params[EnumsProtocol::SESSION_KEY] = $this->authParams->sessionKey();
+            $params[EnumsProtocol::VIEWER_ID]   = $this->authParams->viewerId();
         }
 
         ksort($params);
@@ -93,12 +88,8 @@ class SubRequest
         foreach ($e_params as $k=>$v)
         {
             if ($k && $v) {
-                if (is_array($v)) {
-                    $url .= '&' . urldecode(http_build_query(array($k => $v)));
-                }
-                else {
-                    $url .= '&' . $k . '=' . $v;
-                }
+                $url .= is_array($v) ? '&' . urldecode(http_build_query(array($k => $v)))
+                                     : '&' . $k . '=' . $v;
             }
         }
 

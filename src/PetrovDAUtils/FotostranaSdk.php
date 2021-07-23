@@ -1,121 +1,67 @@
 <?php
 namespace PetrovDAUtils;
 
-//Enums
-use PetrovDAUtils\Enums\EnumsConfig;
+// Different
+use PetrovDAUtils\Interfaces\IError;
+use PetrovDAUtils\Request\RequestBase;
+
+// Services
+use PetrovDAUtils\Service\ServiceUser;
+use PetrovDAUtils\Service\ServiceBilling;
 
 // Models
-use PetrovDAUtils\Models\ModelUser;
-use PetrovDAUtils\Models\ModelBilling;
-use PetrovDAUtils\Models\ModelWall;
-use PetrovDAUtils\Models\ModelMobileApi;
-
-// Request
-use PetrovDAUtils\Request\RequestBase;
+use PetrovDAUtils\Model\ModelError;
+use PetrovDAUtils\Model\ModelAuth;
 
 /**
  * ќсновной класс Fotostrana SDK
  */
-class FotostranaSdk
+class FotostranaSdk implements IError
 {
-    private $cache = array();
-    public $isExecutable = true;
-    public $lastError = null;
+    private $cache = [];
+    private $error = null;
 
-    function __construct()
+    /** @var ModelAuth */
+    private $authParams;
+
+    public function __construct()
     {
-        try
-        {
-            $this->selfTest();
-            $this->checkAuth();
-        }
-        catch (FotostranaError $e)
-        {
-            $this->isExecutable = false;
-            $this->lastError = $e;
-            return;
-        }
-
+        $this->selfTest();
+        $this->checkAuth();
         $this->flushCache();
     }
 
-    function getUser($user_id)
+    /**
+     * @return ModelError|null
+     */
+    public function error()
     {
-        if (!$this->isExecutable) return null;
-        if (!array_key_exists($user_id, $this->cache['users'])) {
-            $this->cache['users'][$user_id] = new ModelUser($user_id);
+        return $this->error;
+    }
+    /**
+     * @return ServiceUser
+     */
+    public function getServiceUser()
+    {
+        if ($this->error) return null;
+        if (empty($this->cache[ServiceUser::class])) {
+            $this->cache[ServiceUser::class] = new ServiceUser(new RequestBase($this->authParams));
         }
-        return $this->cache['users'][$user_id];
+        return $this->cache[ServiceUser::class];
     }
 
-    /** @deprecated  */
-    function getWall($user_id)
+    public function getServiceBilling()
     {
-        if (!$this->isExecutable) return null;
-        if (!array_key_exists($user_id, $this->cache['walls'])) {
-            $this->cache['walls'][$user_id] = new ModelWall($user_id);
+        if ($this->error) return null;
+        if (empty($this->cache[ServiceBilling::class])) {
+            $this->cache[ServiceBilling::class] = new ServiceBilling(new RequestBase($this->authParams));
         }
-        return $this->cache['walls'][$user_id];
+        return $this->cache[ServiceBilling::class];
     }
 
-    function getBilling()
+    public function flushCache()
     {
-        if (!$this->isExecutable) return null;
-        if (!$this->cache['billing']) {
-            $this->cache['billing'] = new ModelBilling();
-        }
-        return $this->cache['billing'];
-    }
-
-    /** @deprecated  */
-    function getExchange()
-    {
-        if (!$this->isExecutable) return null;
-        if (!$this->cache['exchange']) {
-            $this->cache['exchange'] = new ModelMobileApi();
-        }
-        return $this->cache['exchange'];
-    }
-
-    function searchUsersAsArray($params=array())
-    {
-        if (!$this->isExecutable) return null;
-        if (array_key_exists('prefix'.serialize($params), $this->cache['search'])) {
-            return $this->cache['search']['prefix'.serialize($params)];
-        } else {
-
-            $r = new RequestBase();
-            $r->setMethod('User.getFromSearch');
-            $r->setParams($params);
-            $apiresult = $r->get();
-            $final = $apiresult['response'];
-
-            $this->cache['search']['prefix'.serialize($params)] = $final;
-            return $final;
-        }
-    }
-
-    function searchUsers($params=array())
-    {
-        if (!$this->isExecutable) return null;
-        $result = $this->searchUsersAsArray($params);
-        $final = array();
-        if (is_array($result) && $result) {
-            foreach ($result as $u) {
-                $final[$u['user_id']] = $this->getUser($u['user_id']);
-            }
-        }
-        return $final;
-    }
-
-    function flushCache()
-    {
-        $this->cache=array();
-        $this->cache['users']=array();
-        $this->cache['search']=array();
-        $this->cache['walls']=array();
-        $this->cache['billing']=array();
-        $this->cache['exchange']=array();
+        $this->cache = [];
     }
 
     private function selfTest()
@@ -124,40 +70,20 @@ class FotostranaSdk
         // тестируем текущее окружение
         // должны быть разрешены file_get_contents и CURL
 
-        $t = true;
-
-        if (!ini_get('allow_url_fopen')) {
-            $t = false;
+        if (
+            !ini_get('allow_url_fopen')
+            || ini_get('safe_mode')
+            || !in_array('curl', get_loaded_extensions())) {
+            $this->error = new ModelError('001');
+            return;
         }
-        if (ini_get('safe_mode')) {
-            $t = false;
-        }
-        if (!in_array('curl', get_loaded_extensions())) {
-            $t = false;
-        }
-
-        if (!$t) {
-            throw new FotostranaError('001');
-        }
-
     }
+
 
     private function checkAuth()
     {
-        // “естируем безопасность
-
-        $t = true;
-        $authParams = FotostranaAuthParams::i();
-
-        $ourAuth = md5(EnumsConfig::FOTOSTRANA_APPID.'_'. $authParams->viewerId() .'_'.EnumsConfig::FOTOSTRANA_SERVERKEY);
-        if (EnumsConfig::FOTOSTRANA_AUTH_KEY_CHECK && ($authParams->authKey() === null || $authParams->authKey() != $ourAuth))
-        {
-            $t = false;
-        }
-
-        if (!$t) {
-            throw new FotostranaError('002');
-        }
+        $this->authParams = new ModelAuth();
+        $this->error = $this->authParams->error();
     }
 
 }

@@ -9,14 +9,14 @@ use PetrovDAUtils\Enums\EnumsConfig;
  */
 class RequestCounter
 {
-    static private $queries=array();
+    static private $queries = [];
 
     const MAX_QUERIES=20; // 20 запросов
     const PER_TIME=10; // за 10 секунд
 
     static function addQuery()
     {
-        self::$queries[time()]='';
+        self::$queries[time()] = '';
     }
 
     static function removeQuery($t)
@@ -31,8 +31,8 @@ class RequestCounter
 
     static function agingQueries()
     {
-        foreach (self::$queries as $q=>$v) {
-            if ($q < (time()-self::PER_TIME)) {
+        foreach (self::$queries as $q => $v) {
+            if ($q < (time() - self::PER_TIME)) {
                 unset (self::$queries[$q]);
             }
         }

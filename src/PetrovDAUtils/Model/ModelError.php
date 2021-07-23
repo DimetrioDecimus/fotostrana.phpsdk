@@ -1,7 +1,7 @@
 <?php
-namespace PetrovDAUtils;
+namespace PetrovDAUtils\Model;
 
-class FotostranaError extends \Exception
+class ModelError extends \Exception
 {
     private $errorCode;
     private $errorTexts = array(
@@ -9,7 +9,6 @@ class FotostranaError extends \Exception
         '002' => 'Incoming request authorization failed.',
         '003' => 'API object is not loaded.',
     );
-
 
     /**
      * FotostranaError constructor.

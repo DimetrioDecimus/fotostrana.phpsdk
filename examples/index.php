@@ -2,4 +2,7 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 $forostranaSdk = new PetrovDAUtils\FotostranaSdk();
-$forostranaSdk->getUser(111);
+if (!$forostranaSdk->error()) {
+    $user = $forostranaSdk->getServiceUser()->getUserProfile(111);
+}
+

@@ -26,7 +26,7 @@ class EnumsConfig
     const FOTOSTRANA_REQUESTS_LOGGER_ENABLED = true;
 
     //параметры безопасности SDK
-    const FOTOSTRANA_AUTH_KEY_CHECK = false;
+    const FOTOSTRANA_AUTH_KEY_CHECK = true;
 
     // обменный курс для функций с валютой
     const FOTOSTRANA_EXCHANGE = 1;
