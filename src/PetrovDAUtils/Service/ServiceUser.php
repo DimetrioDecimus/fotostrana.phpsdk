@@ -22,7 +22,7 @@ class ServiceUser extends ServiceAbstract
             'User.getProfiles',
             [
                 EnumsProtocol::USER_IDS => $userId,
-                EnumsProtocol::FIELDS   =>'user_name,user_is_hidden,user_lastname,user_link,sex,birthday,photo_small,photo_97,photo_192,photo_big,photo_box,city_id,city_name,slogan,vip_end,is_payable'
+                EnumsProtocol::FIELDS   =>'user_name,time_out,user_is_hidden,user_lastname,user_link,sex,birthday,photo_small,photo_97,photo_192,photo_big,photo_box,city_id,city_name,slogan,vip_end,is_payable'
             ]
         );
     }
