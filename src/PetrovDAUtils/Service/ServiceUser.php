@@ -37,7 +37,38 @@ class ServiceUser extends ServiceAbstract
             'User.getProfiles',
             [
                 EnumsProtocol::USER_IDS => implode(',',$userIds),
-                EnumsProtocol::FIELDS   =>'user_name,time_out,user_is_hidden,user_lastname,user_link,sex,birthday,photo_small,photo_97,photo_192,photo_big,photo_box,city_id,city_name,slogan,vip_end,is_payable'
+                EnumsProtocol::FIELDS   =>'user_name,time_in,time_out,user_is_hidden,user_lastname,user_link,sex,birthday,photo_small,photo_97,photo_192,photo_big,photo_box,city_id,city_name,slogan,vip_end,is_payable'
+            ]
+        );
+    }
+
+
+    /**
+     * @param int $userId
+     * @return ModelRequestResponse
+     * @throws ModelError
+     */
+    public function getLastOnline(int $userId)
+    {
+        return $this->requestFotostranaApi(
+            'User.lastOnline',
+            [
+                EnumsProtocol::USER_IDS => $userId,
+            ]
+        );
+    }
+
+    /**
+     * @param array $userIds
+     * @return ModelRequestResponse
+     * @throws ModelError
+     */
+    public function getLastOnlineArray(array $userIds)
+    {
+        return $this->requestFotostranaApi(
+            'User.lastOnline',
+            [
+                EnumsProtocol::USER_IDS => implode(',',$userIds),
             ]
         );
     }
