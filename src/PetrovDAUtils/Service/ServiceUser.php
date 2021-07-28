@@ -26,18 +26,47 @@ class ServiceUser extends ServiceAbstract
             ]
         );
     }
+    /**
+     * @param int[] $userIds
+     * @return ModelRequestResponse
+     * @throws ModelError
+     */
+    public function getUsersProfiles(array $userIds) : ModelRequestResponse
+    {
+        return $this->requestFotostranaApi(
+            'User.getProfiles',
+            [
+                EnumsProtocol::USER_IDS => implode(',',$userIds),
+                EnumsProtocol::FIELDS   =>'user_name,time_out,user_is_hidden,user_lastname,user_link,sex,birthday,photo_small,photo_97,photo_192,photo_big,photo_box,city_id,city_name,slogan,vip_end,is_payable'
+            ]
+        );
+    }
 
+    /**
+     * @param int $userId
+     * @return ModelRequestResponse
+     * @throws ModelError
+     */
+    public function isOnline(int $userId) : ModelRequestResponse
+    {
+        return $this->requestFotostranaApi(
+            'User.isOnline',
+            [
+                EnumsProtocol::USER_IDS => $userId,
+            ]
+        );
+    }
     /**
      * @param array $userIds
      * @return ModelRequestResponse
      * @throws ModelError
      */
-    public function isOnline(array $userIds) : ModelRequestResponse
+    public function areUsersOnline(array $userIds) : ModelRequestResponse
     {
         return $this->requestFotostranaApi(
             'User.isOnline',
             [
-                EnumsProtocol::USER_IDS => $userIds,
+                EnumsProtocol::USER_IDS => implode(',',$userIds),
             ]
         );
     }
