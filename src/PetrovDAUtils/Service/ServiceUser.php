@@ -22,7 +22,22 @@ class ServiceUser extends ServiceAbstract
             'User.getProfiles',
             [
                 EnumsProtocol::USER_IDS => $userId,
-                EnumsProtocol::FIELDS   =>'user_name,user_lastname,user_link,sex,birthday,photo_small,photo_97,photo_192,photo_big,photo_box,city_id,city_name,slogan,vip_end,is_payable'
+                EnumsProtocol::FIELDS   =>'user_name,user_is_hidden,is_online,user_lastname,user_link,sex,birthday,photo_small,photo_97,photo_192,photo_big,photo_box,city_id,city_name,slogan,vip_end,is_payable'
+            ]
+        );
+    }
+
+    /**
+     * @param array $userIds
+     * @return ModelRequestResponse
+     * @throws ModelError
+     */
+    public function isOnline(array $userIds) : ModelRequestResponse
+    {
+        return $this->requestFotostranaApi(
+            'User.isOnline',
+            [
+                EnumsProtocol::USER_IDS => $userIds,
             ]
         );
     }
