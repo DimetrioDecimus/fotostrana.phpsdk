@@ -87,6 +87,37 @@ class ServiceUser extends ServiceAbstract
             ]
         );
     }
+
+    /**
+     * @param int $userId
+     * @return ModelRequestResponse
+     * @throws ModelError
+     */
+    public function getUserBlackList(int $userId) : ModelRequestResponse
+    {
+        return $this->requestFotostranaApi(
+            'User.blackList',
+            [
+                EnumsProtocol::USER_IDS => $userId,
+            ]
+        );
+    }
+
+    /**
+     * @param array $userIds
+     * @return ModelRequestResponse
+     * @throws ModelError
+     */
+    public function getUsersBlackList(array $userIds) : ModelRequestResponse
+    {
+        return $this->requestFotostranaApi(
+            'User.blackList',
+            [
+                EnumsProtocol::USER_IDS => implode(',', $userIds),
+            ]
+        );
+    }
+
     /**
      * @param array $userIds
      * @return ModelRequestResponse
