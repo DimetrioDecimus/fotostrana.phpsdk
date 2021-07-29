@@ -108,6 +108,14 @@ class ServiceUser extends ServiceAbstract
         );
     }
 
+    public function getUserNewGuests(int $userId)
+    {
+        return $this->requestFotostranaApi(
+            'User.newGuests',
+            [EnumsProtocol::USER_ID => $userId,]
+        );
+    }
+
     /**
      * @param array $userIds
      * @return ModelRequestResponse
