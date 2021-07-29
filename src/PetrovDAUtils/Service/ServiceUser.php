@@ -96,10 +96,15 @@ class ServiceUser extends ServiceAbstract
     public function getUserBlackList(int $userId) : ModelRequestResponse
     {
         return $this->requestFotostranaApi(
-            'User.blackList',
-            [
-                EnumsProtocol::USER_IDS => $userId,
-            ]
+            'User.blackList', [EnumsProtocol::USER_IDS => $userId,]
+        );
+    }
+
+    public function getUserInterests(int $userId)
+    {
+        return $this->requestFotostranaApi(
+            'User.interests',
+            [EnumsProtocol::USER_ID => $userId,]
         );
     }
 
