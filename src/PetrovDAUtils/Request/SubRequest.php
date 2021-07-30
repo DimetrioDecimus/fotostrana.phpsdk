@@ -18,6 +18,7 @@ class SubRequest
         'User.sendAppEmail',
         // TODO: strange achive system
         'User.giveAchievment',
+        'User.holidays',
 
         'Userphoto.checkAccess',
 

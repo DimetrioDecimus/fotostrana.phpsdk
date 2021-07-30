@@ -116,6 +116,14 @@ class ServiceUser extends ServiceAbstract
         );
     }
 
+    public function getUsersHolidays(array $userIds)
+    {
+        return $this->requestFotostranaApi(
+            'User.holidays',
+            [EnumsProtocol::USER_IDS => implode(',', $userIds),]
+        );
+    }
+
     /**
      * @param array $userIds
      * @return ModelRequestResponse
