@@ -18,10 +18,10 @@ class RequestBase
     private $mode= EnumsProtocol::HTTP_QUERY_GET;
     private $method;
     private $params = [];
-    private $result_raw;
+    private $resultRaw;
     private $cache;
-    private $cache_allowed = true;
-    private $old_cache_state = null;
+    private $cacheAllowed = true;
+    private $oldCacheState = null;
     private $logDir  = '/log/';
     private $logFileName = 'requests.log';
     private $logFilePath;
@@ -33,8 +33,14 @@ class RequestBase
         $this->flushResult();
         $this->cache = new RequestCache();
         $this->logDir = dirname(__FILE__) . $this->logDir;
-        if (!is_dir($this->logDir)) mkdir($this->logDir, 0777, true);
-        if ($this->logDir) $this->logFilePath = $this->logDir . $this->logFileName;
+
+        if (!is_dir($this->logDir)) {
+            mkdir($this->logDir, 0777, true);
+        }
+
+        if ($this->logDir) {
+            $this->logFilePath = $this->logDir . $this->logFileName;
+        }
     }
 
     /**
@@ -55,7 +61,10 @@ class RequestBase
      */
     function setParam($name,$value)
     {
-        if ($value) $this->params[$name] = $value;
+        if ($value) {
+            $this->params[$name] = $value;
+        }
+
         return $this;
     }
 
@@ -71,12 +80,13 @@ class RequestBase
     }
 
     /**
+     * @param bool $toSet
      * @return $this
      */
     function setCache(bool $toSet)
     {
-        $this->old_cache_state = $this->cache_allowed;
-        $this->cache_allowed = $toSet;
+        $this->oldCacheState = $this->cacheAllowed;
+        $this->cacheAllowed = $toSet;
         return $this;
     }
 
@@ -85,9 +95,11 @@ class RequestBase
      */
     function restoreCache()
     {
-        if ($this->old_cache_state === null) return $this;
-        $this->setCache($this->old_cache_state);
-        $this->old_cache_state = null;
+        if ($this->oldCacheState === null) {
+            return $this;
+        }
+        $this->setCache($this->oldCacheState);
+        $this->oldCacheState = null;
         return $this;
     }
 
@@ -98,19 +110,19 @@ class RequestBase
     function sendRequest()
     {
         $this->runRequest();
-        return new ModelRequestResponse($this->result_raw);
+        return new ModelRequestResponse($this->resultRaw);
     }
 
     private function runRequest()
     {
         // готовим запрос
         $r = new SubRequest($this->authParams);
-        $p = array_merge($this->params, array('method'=>$this->method));
+        $p = array_merge($this->params, array('method' => $this->method));
 
-        if ($this->cache_allowed && $cached_result = $this->cache->loadCache($p)) {
-            $this->result_raw = $cached_result;
+        if ($this->cacheAllowed && $cached_result = $this->cache->loadCache($p)) {
+            $this->resultRaw = $cached_result;
             if ($this->logFilePath && EnumsConfig::FOTOSTRANA_REQUESTS_LOGGER_ENABLED) {
-                file_put_contents($this->logFilePath, date('r').' cache: '.$this->method.' '.serialize($this->params).' '.serialize($cached_result)."\n\n", FILE_APPEND);
+                file_put_contents($this->logFilePath, date('r') . ' cache: ' . $this->method . ' ' . serialize($this->params) . ' ' . serialize($cached_result) . "\n\n", FILE_APPEND);
             }
             return;
         }
@@ -119,13 +131,15 @@ class RequestBase
         RequestCounter::addQuery();
         RequestCounter::wait();
 
-        $url = $r->makeApiRequestUrl( $p );
+        $url = $r->makeApiRequestUrl($p);
 
-        if (EnumsConfig::FOTOSTRANA_DEBUG) { echo "Fetching URL ".htmlspecialchars($url)." by ".$this->mode."<br>\n"; }
+        if (EnumsConfig::FOTOSTRANA_DEBUG) {
+            echo "Fetching URL " . htmlspecialchars($url) . " by " . $this->mode . "<br>\n";
+        }
 
         // делаем запрос
-        if (strtoupper($this->mode)==EnumsProtocol::HTTP_QUERY_GET) {
-            $this->result_raw =  file_get_contents($url);
+        if (strtoupper($this->mode) == EnumsProtocol::HTTP_QUERY_GET) {
+            $this->resultRaw = file_get_contents($url);
         } else {
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_HEADER, 0);
@@ -135,19 +149,21 @@ class RequestBase
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $this->params);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            $this->result_raw = curl_exec($ch);
+            $this->resultRaw = curl_exec($ch);
             curl_close($ch);
         }
 
         if ($this->logFilePath && EnumsConfig::FOTOSTRANA_REQUESTS_LOGGER_ENABLED) {
-            file_put_contents($this->logFilePath, date('r').' request: '.$this->method.' '.serialize($this->params).' '.$this->result_raw."\n\n", FILE_APPEND);
+            file_put_contents($this->logFilePath, date('r') . ' request: ' . $this->method . ' ' . serialize($this->params) . ' ' . $this->resultRaw . "\n\n", FILE_APPEND);
         }
 
-        if ($this->cache_allowed) {
-            $this->cache->storeCache($p, $this->result_raw);
+        if ($this->cacheAllowed) {
+            $this->cache->storeCache($p, $this->resultRaw);
         }
 
-        if (EnumsConfig::FOTOSTRANA_DEBUG) { var_dump($this->result_raw); }
+        if (EnumsConfig::FOTOSTRANA_DEBUG) {
+            var_dump($this->resultRaw);
+        }
 
     }
 
@@ -155,8 +171,8 @@ class RequestBase
     {
         $this->method = false;
         $this->params = [];
-        $this->result_raw = false;
-        $this->mode=EnumsProtocol::HTTP_QUERY_GET;
+        $this->resultRaw = false;
+        $this->mode = EnumsProtocol::HTTP_QUERY_GET;
         $this->setCache(true);
     }
 

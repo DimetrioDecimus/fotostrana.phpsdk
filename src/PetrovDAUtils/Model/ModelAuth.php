@@ -7,14 +7,9 @@ namespace PetrovDAUtils\Model;
 use PetrovDAUtils\Enums\EnumsConfig;
 use PetrovDAUtils\Enums\EnumsProtocol;
 use PetrovDAUtils\Interfaces\IError;
-use PetrovDAUtils\Model\ModelError;
 
 class ModelAuth implements IError
 {
-    /**
-     * @var ModelAuth
-     */
-
     private $sessionKey;
     private $viewerId;
     private $authKey;
@@ -37,9 +32,8 @@ class ModelAuth implements IError
 
 
 
-        $ourAuth = md5(EnumsConfig::FOTOSTRANA_APPID.'_'. $this->viewerId .'_'.EnumsConfig::FOTOSTRANA_SERVERKEY);
-        if (EnumsConfig::FOTOSTRANA_AUTH_KEY_CHECK && ($this->authKey === null || $this->authKey != $ourAuth))
-        {
+        $ourAuth = md5(EnumsConfig::FOTOSTRANA_APPID . '_' . $this->viewerId . '_' . EnumsConfig::FOTOSTRANA_SERVERKEY);
+        if (EnumsConfig::FOTOSTRANA_AUTH_KEY_CHECK && ($this->authKey === null || $this->authKey != $ourAuth)) {
             $this->error = new ModelError('002');
             return;
         }
@@ -55,11 +49,17 @@ class ModelAuth implements IError
     /**
      * @return mixed
      */
-    public function sessionKey() { return $this->sessionKey; }
+    public function sessionKey()
+    {
+        return $this->sessionKey;
+    }
 
     /**
      * @return mixed
      */
-    public function viewerId() { return $this->viewerId; }
+    public function viewerId()
+    {
+        return $this->viewerId;
+    }
 
 }

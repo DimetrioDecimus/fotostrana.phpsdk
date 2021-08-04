@@ -37,11 +37,13 @@ class ServiceBilling extends ServiceAbstract
             EnumsProtocol::HTTP_QUERY_POST
         );
 
-        if ($result->error()) return $result;
+        if ($result->error()) {
+            return $result;
+        }
 
-        if (!isset($result->data()['transferred']) || $result->data()['transferred']<>$amount) {
+        if (!isset($result->data()['transferred']) || $result->data()['transferred'] <> $amount) {
             $result->setError(
-                new ModelError('Billing',"Billing problem: ".serialize($result->error()->getMessage()))
+                new ModelError('Billing',"Billing problem: " . serialize($result->error()->getMessage()))
             );
         }
 
@@ -55,7 +57,9 @@ class ServiceBilling extends ServiceAbstract
     public function getAppBalance() : ModelRequestResponse
     {
         $response = $this->requestFotostranaApi('Billing.getAppBalance',[],false);
-        if ($response->error()) return $response;
+        if ($response->error()) {
+            return $response;
+        }
 
         if (($balance = $response->data()['balance'] ?? null) === null) {
             $response->setError(

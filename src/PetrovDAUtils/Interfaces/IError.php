@@ -1,8 +1,5 @@
 <?php
-
-
 namespace PetrovDAUtils\Interfaces;
-
 
 use PetrovDAUtils\Model\ModelError;
 

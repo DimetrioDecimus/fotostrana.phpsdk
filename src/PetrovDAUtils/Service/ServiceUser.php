@@ -22,7 +22,7 @@ class ServiceUser extends ServiceAbstract
             'User.getProfiles',
             [
                 EnumsProtocol::USER_IDS => $userId,
-                EnumsProtocol::FIELDS   =>'user_name,user_lastname,user_link,sex,birthday,photo_small,photo_97,photo_192,photo_big,photo_box,city_id,city_name,slogan,vip_end,is_payable'
+                EnumsProtocol::FIELDS   => 'user_name,user_lastname,user_link,sex,birthday,photo_small,photo_97,photo_192,photo_big,photo_box,city_id,city_name,slogan,vip_end,is_payable'
             ]
         );
     }
@@ -35,7 +35,8 @@ class ServiceUser extends ServiceAbstract
     function getRegistrationDate(int $userId) : ModelRequestResponse
     {
         return $this->requestFotostranaApi(
-            'User.getRegistrationDate', [EnumsProtocol::USER_ID => $userId]
+            'User.getRegistrationDate',
+            [EnumsProtocol::USER_ID => $userId]
         );
     }
 
@@ -47,7 +48,8 @@ class ServiceUser extends ServiceAbstract
     function getFriendsIds(int $userId) : ModelRequestResponse
     {
         return $this->requestFotostranaApi(
-            'User.getFriendsAny', [EnumsProtocol::USER_ID => $userId]
+            'User.getFriendsAny',
+            [EnumsProtocol::USER_ID => $userId]
         );
     }
 
@@ -59,7 +61,8 @@ class ServiceUser extends ServiceAbstract
     function getIsAppInstall(int $userId) : ModelRequestResponse
     {
         return $this->requestFotostranaApi(
-            'User.isAppWidgetUser', [EnumsProtocol::USER_ID => $userId]
+            'User.isAppWidgetUser',
+            [EnumsProtocol::USER_ID => $userId]
         );
     }
 
@@ -71,7 +74,8 @@ class ServiceUser extends ServiceAbstract
     function getUserSettings(int $userId) : ModelRequestResponse
     {
         return $this->requestFotostranaApi(
-            'User.getUserSettingsAny', [EnumsProtocol::USER_ID, $userId]
+            'User.getUserSettingsAny',
+            [EnumsProtocol::USER_ID => $userId]
         );
     }
 

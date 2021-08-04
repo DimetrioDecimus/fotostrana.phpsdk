@@ -9,21 +9,21 @@ use PetrovDAUtils\Enums\EnumsConfig;
  */
 class RequestCache
 {
-    private $cache_dir;
+    private $cacheDir;
 
     function __construct()
     {
-        $this->cache_dir = dirname(__FILE__) . '/cache/';
-        if (!is_dir($this->cache_dir)) {
-            mkdir($this->cache_dir, 0777, true);
+        $this->cacheDir = dirname(__FILE__) . '/cache/';
+        if (!is_dir($this->cacheDir)) {
+            mkdir($this->cacheDir, 0777, true);
         }
     }
 
     function storeCache($params, $data)
     {
         if ($params) {
-            file_put_contents($this->cache_dir . $this->makeCacheKey($params), $this->encryptData($data));
-            chmod($this->cache_dir . $this->makeCacheKey($params), 0777);
+            file_put_contents($this->cacheDir . $this->makeCacheKey($params), $this->encryptData($data));
+            chmod($this->cacheDir . $this->makeCacheKey($params), 0777);
         }
     }
 
@@ -33,9 +33,15 @@ class RequestCache
      */
     function loadCache($params)
     {
-        if (!$params) return null;
-        $f = $this->cache_dir . $this->makeCacheKey($params);
-        if (!file_exists($f)) return null;
+        if (!$params) {
+            return null;
+        }
+
+        $f = $this->cacheDir . $this->makeCacheKey($params);
+        if (!file_exists($f)) {
+            return null;
+        }
+
         if (filemtime($f) < (time() - EnumsConfig::FOTOSTRANA_REQUESTS_CACHE_TIMEOUT)) {
             @unlink($f);
             return null;
@@ -50,7 +56,9 @@ class RequestCache
      */
     private function makeCacheKey($params)
     {
-        if (!$params) return '';
+        if (!$params) {
+            return '';
+        }
 
         // убираем всякие рандомные параметры
         unset($params['timestamp']);
@@ -59,7 +67,12 @@ class RequestCache
     }
 
     // пользователь может добавить шифрование и дешифрование данных по вкусу
-    private function encryptData($data) { return serialize($data); }
-    private function decryptData($data) { return unserialize($data); }
+    private function encryptData($data) {
+        return serialize($data);
+    }
+
+    private function decryptData($data) {
+        return unserialize($data);
+    }
 
 }

@@ -18,17 +18,25 @@ class ModelError extends \Exception
     public function __construct($errorCode, $errorMessage = null)
     {
         $this->errorCode = $errorCode;
-        if ($errorMessage !== null) $this->errorTexts[(string)$this->errorCode] = $errorMessage;
+        if ($errorMessage !== null) {
+            $this->errorTexts[ (string) $this->errorCode] = $errorMessage;
+        }
         $this->message = $this->errorTexts[$this->errorCode];
     }
 
     /**
      * @return mixed
      */
-    public function getErrorCode() { return $this->errorCode; }
+    public function getErrorCode()
+    {
+        return $this->errorCode;
+    }
 
     /**
      * @return string
      */
-    public function getErrorMessage() { return $this->errorTexts[(string)$this->errorCode]; }
+    public function getErrorMessage()
+    {
+        return $this->errorTexts[(string)$this->errorCode];
+    }
 }

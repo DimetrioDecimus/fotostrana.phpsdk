@@ -3,9 +3,7 @@
 
 namespace PetrovDAUtils\Model;
 
-
 use PetrovDAUtils\Enums\EnumsProtocol;
-use PetrovDAUtils\Model\ModelError;
 use PetrovDAUtils\Interfaces\IError;
 
 class ModelRequestResponse implements IError
@@ -24,7 +22,7 @@ class ModelRequestResponse implements IError
             }
 
             if ($decodedData[EnumsProtocol::ERROR] ?? null) {
-                throw new ModelError('API Request error', 'Error: '. (isset($this->error['error_subcode']) ? $this->error['error_subcode'].' (subcode)' : $this->error['error_code'].' (code)') . ': ' . $this->error['error_msg']);
+                throw new ModelError('API Request error', 'Error: ' . (isset($this->error['error_subcode']) ? $this->error['error_subcode'] . ' (subcode)' : $this->error['error_code'] . ' (code)') . ': ' . $this->error['error_msg']);
             }
 
             if (!$this->data = $decodedData[EnumsProtocol::RESPONSE] ?? null) {
@@ -37,7 +35,19 @@ class ModelRequestResponse implements IError
 
     }
 
-    public function setError(ModelError $error) { $this->error = $error; return $this; }
-    public function error() { return $this->error; }
-    public function data() { return $this->data; }
+    public function setError(ModelError $error)
+    {
+        $this->error = $error;
+        return $this;
+    }
+
+    public function error()
+    {
+        return $this->error;
+    }
+
+    public function data()
+    {
+        return $this->data;
+    }
 }

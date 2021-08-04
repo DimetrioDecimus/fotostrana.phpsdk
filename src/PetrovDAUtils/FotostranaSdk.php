@@ -43,19 +43,27 @@ class FotostranaSdk implements IError
      */
     public function getServiceUser()
     {
-        if ($this->error) return null;
+        if ($this->error) {
+            return null;
+        }
+
         if (empty($this->cache[ServiceUser::class])) {
             $this->cache[ServiceUser::class] = new ServiceUser(new RequestBase($this->authParams));
         }
+
         return $this->cache[ServiceUser::class];
     }
 
     public function getServiceBilling()
     {
-        if ($this->error) return null;
+        if ($this->error) {
+            return null;
+        }
+
         if (empty($this->cache[ServiceBilling::class])) {
             $this->cache[ServiceBilling::class] = new ServiceBilling(new RequestBase($this->authParams));
         }
+
         return $this->cache[ServiceBilling::class];
     }
 
@@ -73,7 +81,8 @@ class FotostranaSdk implements IError
         if (
             !ini_get('allow_url_fopen')
             || ini_get('safe_mode')
-            || !in_array('curl', get_loaded_extensions())) {
+            || !in_array('curl', get_loaded_extensions())
+        ) {
             $this->error = new ModelError('001');
             return;
         }

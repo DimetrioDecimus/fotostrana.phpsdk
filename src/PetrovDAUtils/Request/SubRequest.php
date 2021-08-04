@@ -39,9 +39,11 @@ class SubRequest
     private function makeSig(array $params) {
         ksort($params);
         $p_string = '';
-        if (!in_array($params['method'],$this->server_methods)) $p_string= $this->authParams->viewerId();
+        if (!in_array($params['method'], $this->server_methods)) {
+            $p_string = $this->authParams->viewerId();
+        }
 
-        foreach ($params as $k=>$v)
+        foreach ($params as $k => $v)
         {
             if ($k && $v) {
                 $p_string .= is_array($v) ? str_replace('&', '', urldecode(http_build_query([$k => $v])))
@@ -49,10 +51,12 @@ class SubRequest
             }
         }
 
-        $p_string.= in_array($params['method'],$this->server_methods) ? EnumsConfig::FOTOSTRANA_SERVERKEY
-                                                                      : EnumsConfig::FOTOSTRANA_CLIENTKEY;
+        $p_string .= in_array($params['method'], $this->server_methods) ? EnumsConfig::FOTOSTRANA_SERVERKEY
+                                                                        : EnumsConfig::FOTOSTRANA_CLIENTKEY;
 
-        if (EnumsConfig::FOTOSTRANA_DEBUG) { echo "p_string: ".$p_string."<br/><br/>\n"; }
+        if (EnumsConfig::FOTOSTRANA_DEBUG) {
+            echo "p_string: " . $p_string . "<br/><br/>\n";
+        }
 
         return  md5($p_string);
     }
@@ -60,7 +64,7 @@ class SubRequest
     function urlencodeArray($params)
     {
         $res = array();
-        foreach ($params as $key=>$value)
+        foreach ($params as $key => $value)
         {
             $res[$key] = is_array($value) ? $this->urlencodeArray($value)
                                           : urlencode($value);
@@ -70,30 +74,42 @@ class SubRequest
 
     function makeApiRequestUrl(array $params) {
 
-        if (!array_key_exists(EnumsProtocol::APP_ID,$params))     { $params[EnumsProtocol::APP_ID] = EnumsConfig::FOTOSTRANA_APPID; }
-        if (!array_key_exists(EnumsProtocol::TIMESTAMP,$params))  { $params[EnumsProtocol::TIMESTAMP] =  time(); }
-        if (!array_key_exists(EnumsProtocol::FORMAT,$params))     { $params[EnumsProtocol::FORMAT] = 1; }
-        if (!array_key_exists(EnumsProtocol::RAND,$params))       { $params[EnumsProtocol::RAND]=rand(1,999999); }
+        if (!array_key_exists(EnumsProtocol::APP_ID, $params)) {
+            $params[EnumsProtocol::APP_ID] = EnumsConfig::FOTOSTRANA_APPID;
+        }
+
+        if (!array_key_exists(EnumsProtocol::TIMESTAMP, $params)) {
+            $params[EnumsProtocol::TIMESTAMP] = time();
+        }
+
+        if (!array_key_exists(EnumsProtocol::FORMAT, $params)) {
+            $params[EnumsProtocol::FORMAT] = 1;
+        }
+
+        if (!array_key_exists(EnumsProtocol::RAND, $params)) {
+            $params[EnumsProtocol::RAND] = rand(1,999999);
+        }
 
         //TODO: check if we really need ti, all requests are servers
-        if (!in_array($params[EnumsProtocol::METHOD],$this->server_methods)) {
+        if (!in_array($params[EnumsProtocol::METHOD], $this->server_methods)) {
             $params[EnumsProtocol::SESSION_KEY] = $this->authParams->sessionKey();
-            $params[EnumsProtocol::VIEWER_ID]   = $this->authParams->viewerId();
+            $params[EnumsProtocol::VIEWER_ID] = $this->authParams->viewerId();
         }
 
         ksort($params);
-        $url= EnumsConfig::FOTOSTRANA_API_BASEURL.'?sig='.$this->makeSig($params);
+        $url = EnumsConfig::FOTOSTRANA_API_BASEURL . '?sig=' . $this->makeSig($params);
 
         $e_params = $this->urlencodeArray($params);
-        foreach ($e_params as $k=>$v)
-        {
+        foreach ($e_params as $k => $v) {
             if ($k && $v) {
                 $url .= is_array($v) ? '&' . urldecode(http_build_query(array($k => $v)))
                                      : '&' . $k . '=' . $v;
             }
         }
 
-        if (EnumsConfig::FOTOSTRANA_DEBUG) { echo "URL: ".htmlspecialchars($url)."<br/><br/>\n"; }
+        if (EnumsConfig::FOTOSTRANA_DEBUG) {
+            echo "URL: " . htmlspecialchars($url) . "<br/><br/>\n";
+        }
 
         return $url;
 
